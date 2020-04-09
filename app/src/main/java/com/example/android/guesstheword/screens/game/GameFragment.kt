@@ -17,6 +17,7 @@
 package com.example.android.guesstheword.screens.game
 
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,10 +36,7 @@ import com.example.android.guesstheword.databinding.GameFragmentBinding
  */
 class GameFragment : Fragment() {
 
-
-    private  lateinit var viewModel: GameViewModel
-
-
+    private lateinit var viewModel: GameViewModel
 
     private lateinit var binding: GameFragmentBinding
 
@@ -53,11 +51,8 @@ class GameFragment : Fragment() {
                 false
         )
 
-        Log.i("GameFragment","Called ViewModelProviders.of!")
+        // Get the viewmodel
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
-
-
-
 
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
@@ -66,15 +61,21 @@ class GameFragment : Fragment() {
             viewModel.onSkip()
         }
 
-        viewModel.score.observe(this, Observer{
-            newScore -> binding.scoreText.text = newScore.toString()
-        }
-        )
-
+        /** Setting up LiveData observation relationship **/
         viewModel.word.observe(this, Observer { newWord ->
-            binding.wordText.text = newWord})
+            binding.wordText.text = newWord
+        })
 
+        viewModel.score.observe(this, Observer { newScore ->
+            binding.scoreText.text = newScore.toString()
+        })
 
+        viewModel.currentTime.observe(this, Observer { newTime ->
+            binding.timerText.text = DateUtils.formatElapsedTime(newTime)
+
+        })
+
+        // Sets up event listening to navigate the player when the game is finished
         viewModel.eventGameFinish.observe(this, Observer { isFinished ->
             if (isFinished) {
                 val currentScore = viewModel.score.value ?: 0
@@ -84,47 +85,8 @@ class GameFragment : Fragment() {
             }
         })
 
-
-
-
-
-
-
-
-
-
         return binding.root
 
-
-
-
-
     }
-
-    /**
-     * Resets the list of words and randomizes the order
-     */
-
-
-    /**
-     * Called when the game is finished
-     */
-  
-
-
-
-    /**
-     * Moves to the next word in the list
-     */
-
-
-    /** Methods for buttons presses **/
-
-
-
-    /** Methods for updating the UI **/
-
-
-
 
 }
